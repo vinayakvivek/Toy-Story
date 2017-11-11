@@ -22,6 +22,7 @@ Node::Node(
   normal_matrix = glm::mat4(1.0f);
 
   last_rot = glm::vec3(0.0f);
+  last_pos = glm::vec3(0.0f);
   is_static = false;
 
   this->shaderProgram = shaderProgram;
@@ -112,13 +113,19 @@ void Node::render(int mode, int curr_keyframe, int curr_frame) {
 
   if (mode == 1) {
     glm::quat q1(glm::vec3(0, 0, 0));
-    glm::quat q2(keyframes[curr_keyframe + 1]);
+    glm::quat q2(rot_keyframes[curr_keyframe + 1]);
 
     glm::quat q_rot = glm::slerp(q1, q2, 1.0f / 120);
     glm::mat4 rot_matrix = glm::mat4_cast(q_rot);
 
     rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
     updateModelMatrix(rot_matrix);
+
+    if (translatable) {
+      glm::mat4 trans_matrix = glm::translate(glm::mat4(1.0f), (1.0f / 120) * pos_keyframes[curr_keyframe + 1]);
+      trans_matrix = model_matrix * glm::inverse(local_matrix) * trans_matrix * local_matrix * glm::inverse(model_matrix);
+      updateModelMatrix(trans_matrix);
+    }
   }
 
   glBindVertexArray(vao);
@@ -164,7 +171,6 @@ void Node::rotate(GLuint axis, GLfloat angle) {
   }
 
   rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
-
   updateModelMatrix(rot_matrix);
 }
 
@@ -202,6 +208,15 @@ void Node::saveKeyframe(std::fstream &key_file) {
            << glm::radians(zrot - last_rot.z) << " ";
   last_rot = glm::vec3(xrot, yrot, zrot);
 
+  if (translatable) {
+    key_file << (xpos - last_pos.x) << " "
+             << (ypos - last_pos.y) << " "
+             << (zpos - last_pos.z) << " ";
+    last_pos = glm::vec3(xpos, ypos, zpos);
+
+    std::cout << "pos: " << glm::to_string(last_pos) << "\n";
+  }
+
   for (Node *child : children) {
     child->saveKeyframe(key_file);
   }
@@ -210,7 +225,13 @@ void Node::saveKeyframe(std::fstream &key_file) {
 void Node::loadKeyframe(std::fstream &key_file) {
   GLfloat x = 0, y = 0, z = 0;
   key_file >> x >> y >> z;
-  keyframes.push_back(glm::vec3(x, y, z));
+  rot_keyframes.push_back(glm::vec3(x, y, z));
+
+  if (translatable) {
+    key_file >> x >> y >> z;
+    pos_keyframes.push_back(glm::vec3(x, y, z));
+    std::cout << "pos: " << glm::to_string(glm::vec3(x, y, z)) << "\n";
+  }
 
   for (Node *child : children) {
     child->loadKeyframe(key_file);

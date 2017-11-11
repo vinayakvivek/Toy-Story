@@ -57,8 +57,10 @@ class Node {
   GLfloat xrot_limits[2], yrot_limits[2], zrot_limits[2];
 
   // for keyframe
-  std::vector<glm::vec3> keyframes;
+  std::vector<glm::vec3> rot_keyframes;
+  std::vector<glm::vec3> pos_keyframes;
   glm::vec3 last_rot;
+  glm::vec3 last_pos;
   bool is_static;
 
   glm::vec4 pivot_point;
