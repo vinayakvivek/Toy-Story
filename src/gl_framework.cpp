@@ -58,9 +58,6 @@ namespace toys {
     } else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
       v->saveKeyframe();
       return;
-    } else if (key == GLFW_KEY_I && action == GLFW_PRESS) {
-      v->loadKeyframes();
-      return;
     } else if (key == GLFW_KEY_B && action == GLFW_PRESS) {
       v->selectModel(0);  // select buzz
       return;

@@ -493,28 +493,8 @@ class Buzz {
     right_foot->rotate(2, 5.0f);
   }
 
-  void render() {
-    hip->render();
-    torso->render();
-
-    neck->render();
-    head->render();
-
-    left_upper_arm->render();
-    left_lower_arm->render();
-    left_hand->render();
-
-    right_upper_arm->render();
-    right_lower_arm->render();
-    right_hand->render();
-
-    left_thigh->render();
-    left_leg->render();
-    left_foot->render();
-
-    right_thigh->render();
-    right_leg->render();
-    right_foot->render();
+  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
+    hip->render(mode, curr_keyframe, curr_frame);
   }
 
   void rotate(GLuint axis, GLfloat angle) {
@@ -576,6 +556,14 @@ class Buzz {
 
   void selectNode(int nodeId) {
     curr_selected_node = nodeId;
+  }
+
+  void saveKeyframe(std::fstream &key_file) {
+    hip->saveKeyframe(key_file);
+  }
+
+  void loadKeyframe(std::fstream &key_file) {
+    hip->loadKeyframe(key_file);
   }
 };
 

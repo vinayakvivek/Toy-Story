@@ -7,7 +7,7 @@ class HammHead : public Node {
     glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)(PI/2 + PI/3), glm::vec3(0.0f, 0.0f, 1.0f));
 
     local_matrix = glm::rotate(glm::mat4(1.0f), -(float)PI/2, glm::vec3(0.0f, 1.0f, 0.0f)) * rotate * scale;
-    updateModelMatrix(local_matrix);
+    updateModelMatrix(local_matrix, false);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 100.0f, 300.0f));
     glm::mat4 initial_transformation = translate;
@@ -40,7 +40,7 @@ class HammTorso : public Node {
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.3f));
 
     local_matrix = scale;
-    updateModelMatrix(local_matrix);
+    updateModelMatrix(local_matrix, false);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(450.0f, -210.0f, -100.0f));
     glm::mat4 initial_transformation = translate * glm::scale(glm::mat4(1.0f), 0.7f * glm::vec3(1.0f, 1.0f, 1.0f));
@@ -83,7 +83,7 @@ class HammNose : public Node {
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     local_matrix = scale;
-    updateModelMatrix(local_matrix);
+    updateModelMatrix(local_matrix, false);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 100.0f, 0.0f));
     glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -117,7 +117,7 @@ class HammLeg : public Node {
     glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     local_matrix = scale;
-    updateModelMatrix(local_matrix);
+    updateModelMatrix(local_matrix, false);
   }
 
  public:
@@ -217,13 +217,6 @@ class Hamm {
 
   void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
     torso->render(mode, curr_keyframe, curr_frame);
-    head->render(mode, curr_keyframe, curr_frame);
-    nose->render(mode, curr_keyframe, curr_frame);
-
-    leg_fl->render(mode, curr_keyframe, curr_frame);
-    leg_fr->render(mode, curr_keyframe, curr_frame);
-    leg_bl->render(mode, curr_keyframe, curr_frame);
-    leg_br->render(mode, curr_keyframe, curr_frame);
   }
 
   void rotate(GLuint axis, GLfloat angle) {
@@ -260,24 +253,10 @@ class Hamm {
 
   void saveKeyframe(std::fstream &key_file) {
     torso->saveKeyframe(key_file);
-    head->saveKeyframe(key_file);
-    nose->saveKeyframe(key_file);
-
-    leg_fl->saveKeyframe(key_file);
-    leg_fr->saveKeyframe(key_file);
-    leg_bl->saveKeyframe(key_file);
-    leg_br->saveKeyframe(key_file);
   }
 
   void loadKeyframe(std::fstream &key_file) {
     torso->loadKeyframe(key_file);
-    head->loadKeyframe(key_file);
-    nose->loadKeyframe(key_file);
-
-    leg_fl->loadKeyframe(key_file);
-    leg_fr->loadKeyframe(key_file);
-    leg_bl->loadKeyframe(key_file);
-    leg_br->loadKeyframe(key_file);
   }
 };
 

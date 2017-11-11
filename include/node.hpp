@@ -78,13 +78,14 @@ class Node {
   void addChild(Node *node);
   virtual void rotate(GLuint axis, GLfloat angle);
   virtual void translate(GLuint axis, GLfloat d);
-  void updateModelMatrix(const glm::mat4 &transformation);
+  void updateModelMatrix(const glm::mat4 &transformation, bool update_child = true);
   void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0);
   void saveKeyframe(std::fstream &key_file);
   void clearKeyframes();
   void loadKeyframe(std::fstream &key_file);
 
   int getId() {return id;}
+  virtual ~Node();
 };
 
 #endif  // _NODE_HPP_

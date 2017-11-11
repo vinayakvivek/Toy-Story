@@ -23,6 +23,13 @@ struct VertexData {
   glm::vec4 *colors;
   glm::vec2 *tex_coords;
   glm::vec4 *normals;
+
+  void deleteData() {
+    delete [] vertices;
+    delete [] colors;
+    delete [] tex_coords;
+    delete [] normals;
+  }
 };
 
 VertexData* sphere(GLfloat r, GLuint n_lats = 50, GLuint n_longs = 50);

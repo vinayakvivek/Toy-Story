@@ -97,12 +97,14 @@ void Node::addChild(Node *node) {
   node->updateModelMatrix(model_matrix * glm::inverse(local_matrix));
 }
 
-void Node::updateModelMatrix(const glm::mat4 &transformation) {
+void Node::updateModelMatrix(const glm::mat4 &transformation, bool update_child) {
   model_matrix = transformation * model_matrix;
   normal_matrix = glm::inverse(glm::transpose(model_matrix));
 
-  for (Node *child : children) {
-    child->updateModelMatrix(transformation);
+  if (update_child) {
+    for (Node *child : children) {
+      child->updateModelMatrix(transformation);
+    }
   }
 }
 
@@ -130,7 +132,9 @@ void Node::render(int mode, int curr_keyframe, int curr_frame) {
   glUniformMatrix4fv(u_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
   glDrawArrays(GL_TRIANGLES, 0, data->num_vertices);
 
-  // TODO: call child->render();
+  for (Node *child : children) {
+    child->render(mode, curr_keyframe, curr_frame);
+  }
 }
 
 void Node::rotate(GLuint axis, GLfloat angle) {
@@ -197,6 +201,10 @@ void Node::saveKeyframe(std::fstream &key_file) {
            << glm::radians(yrot - last_rot.y) << " "
            << glm::radians(zrot - last_rot.z) << " ";
   last_rot = glm::vec3(xrot, yrot, zrot);
+
+  for (Node *child : children) {
+    child->saveKeyframe(key_file);
+  }
 }
 
 void Node::loadKeyframe(std::fstream &key_file) {
@@ -204,9 +212,24 @@ void Node::loadKeyframe(std::fstream &key_file) {
   key_file >> x >> y >> z;
   keyframes.push_back(glm::vec3(x, y, z));
 
+  for (Node *child : children) {
+    child->loadKeyframe(key_file);
+  }
+
   // std::cout << "id: " << id << ", " << glm::to_string(glm::vec3(x, y, z)) << "\n";
 }
 
-void Node::clearKeyframes() {
-  keyframes.clear();
+Node::~Node() {
+  // for (int i = 0; i < children.size(); ++i) {
+  //   delete children[i];
+  // }
+
+  glDeleteTextures(1, &tex);
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+
+  std::cout << "deleting id: " << id << "\n";
+
+  data->deleteData();
+  delete data;
 }
