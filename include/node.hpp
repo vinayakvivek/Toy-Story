@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -55,6 +56,11 @@ class Node {
   GLfloat xrot, yrot, zrot;
   GLfloat xrot_limits[2], yrot_limits[2], zrot_limits[2];
 
+  // for keyframe
+  std::vector<glm::vec3> keyframes;
+  glm::vec3 last_rot;
+  bool is_static;
+
   glm::vec4 pivot_point;
 
   std::vector<Node*> children;
@@ -74,6 +80,8 @@ class Node {
   virtual void translate(GLuint axis, GLfloat d);
   void updateModelMatrix(const glm::mat4 &transformation);
   void render();
+  void saveKeyframe(std::fstream &key_file);
+  void loadKeyframes(std::fstream &key_file);
 
   int getId() {return id;}
 };

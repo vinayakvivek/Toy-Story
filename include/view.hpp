@@ -37,7 +37,7 @@ class View {
   glm::vec4 spotlight_position[2];
   GLuint lights_state[3];
 
-  Buzz *buzz;
+  // Buzz *buzz;
   Hamm *hamm;
 
   Floor *floor;
@@ -50,6 +50,12 @@ class View {
    *  1 -> Hamm
    */
   int curr_selected_model;
+
+  /**
+   *  0 -> record mode
+   *  1 -> play mode
+   */
+  int mode;
 
   void initShadersGL();
  public:
@@ -68,6 +74,9 @@ class View {
 
   void togglePerspective();
   void updateView(GLfloat h_width, GLfloat h_height);
+
+  void toggleMode();
+  void saveKeyframe();
 };
 
 #endif  // VIEW_HPP_

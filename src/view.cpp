@@ -24,7 +24,7 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   initShadersGL();
 
   updateCamera();
-  buzz = new Buzz(shaderProgram);
+  // buzz = new Buzz(shaderProgram);
   hamm = new Hamm(shaderProgram);
 
   floor = new Floor("floor", 0, shaderProgram, NULL);
@@ -33,7 +33,10 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   bulb = new Bulb("bulb", 0, shaderProgram, NULL);
   bulb->translate(glm::vec3(spotlight_position[0]));
 
-  curr_selected_model = 0;
+  curr_selected_model = 1;
+
+  // record mode
+  mode = 0;
 }
 
 void View::updateView(GLfloat h_width, GLfloat h_height) {
@@ -74,7 +77,7 @@ void View::renderGL() {
   glUniform1uiv(u_lights_state, 3, &lights_state[0]);
   glUniformMatrix4fv(u_view_matrix, 1, GL_FALSE, glm::value_ptr(view_matrix));
 
-  buzz->render();
+  // buzz->render();
   hamm->render();
 
   floor->render();
@@ -200,4 +203,29 @@ void View::zoom(GLfloat amount) {
   c_zpos -= d.z;
 
   updateCamera();
+}
+
+void View::toggleMode() {
+  mode = !mode;
+}
+
+void View::saveKeyframe() {
+  if (mode != 0)
+    return;
+
+  std::string file_name = "keyframes.txt";
+
+  std::fstream key_file;
+  key_file.open(file_name, std::ios::out | std::ios::app);
+
+  if (!key_file.is_open()) {
+    std::cout << "could not open keyframes.txt\n";
+    return;
+  }
+
+  hamm->saveKeyframe(key_file);
+
+  key_file << "\n";
+
+  std::cout << "keyframe saved!\n";
 }

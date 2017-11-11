@@ -257,6 +257,10 @@ class Hamm {
   void selectNode(int nodeId) {
     curr_selected_node = nodeId;
   }
+
+  void saveKeyframe(std::fstream &key_file) {
+    torso->saveKeyframe(key_file);
+  }
 };
 
 #endif  // HAMM_MODEL_HPP_

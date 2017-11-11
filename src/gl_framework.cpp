@@ -52,6 +52,12 @@ namespace toys {
     } else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
       v->togglePerspective();
       return;
+    } else if (key == GLFW_KEY_M && action == GLFW_PRESS) {
+      v->toggleMode();
+      return;
+    } else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+      v->saveKeyframe();
+      return;
     } else if (key == GLFW_KEY_B && action == GLFW_PRESS) {
       v->selectModel(0);  // select buzz
       return;

@@ -21,10 +21,12 @@ Node::Node(
   model_matrix = glm::mat4(1.0f);
   normal_matrix = glm::mat4(1.0f);
 
+  last_rot = glm::vec3(0.0f);
+  is_static = false;
+
   this->shaderProgram = shaderProgram;
 
   this->parent = parent;
-  // populateBuffers();
   children.resize(0);
 }
 
@@ -98,7 +100,6 @@ void Node::addChild(Node *node) {
 void Node::updateModelMatrix(const glm::mat4 &transformation) {
   model_matrix = transformation * model_matrix;
   normal_matrix = glm::inverse(glm::transpose(model_matrix));
-  pivot_point = transformation * pivot_point;
 
   for (Node *child : children) {
     child->updateModelMatrix(transformation);
@@ -145,7 +146,7 @@ void Node::rotate(GLuint axis, GLfloat angle) {
       }
       break;
   }
-  // rot_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(pivot_point)) * rot_matrix * glm::translate(glm::mat4(1.0f), glm::vec3(-pivot_point));
+
   rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
 
   updateModelMatrix(rot_matrix);
@@ -177,4 +178,10 @@ void Node::translate(GLuint axis, GLfloat d) {
 
   trans_matrix = model_matrix * glm::inverse(local_matrix) * trans_matrix * local_matrix * glm::inverse(model_matrix);
   updateModelMatrix(trans_matrix);
+}
+
+void Node::saveKeyframe(std::fstream &key_file) {
+  key_file << glm::radians(xrot - last_rot.x) << " "
+           << glm::radians(yrot - last_rot.y) << " "
+           << glm::radians(zrot - last_rot.z) << " ";
 }

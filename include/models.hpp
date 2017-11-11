@@ -28,6 +28,8 @@ class Bulb : public Node {
     yrot_limits[0] = -0.0; yrot_limits[1] = 0.0;
     zrot_limits[0] = -0.0; zrot_limits[1] = 0.0;
 
+    is_static = true;
+
     populateBuffers();
     setInitialTransformation();
   }
@@ -62,6 +64,8 @@ class Floor : public Node {
     yrot_limits[0] = -0.0; yrot_limits[1] = 0.0;
     zrot_limits[0] = -0.0; zrot_limits[1] = 0.0;
 
+    is_static = true;
+
     populateBuffers();
     setInitialTransformation();
   }
@@ -90,6 +94,8 @@ class Ceiling : public Node {
     xrot_limits[0] = -0.0; xrot_limits[1] = 0.0;
     yrot_limits[0] = -0.0; yrot_limits[1] = 0.0;
     zrot_limits[0] = -0.0; zrot_limits[1] = 0.0;
+
+    is_static = true;
 
     populateBuffers();
     setInitialTransformation();
@@ -120,6 +126,8 @@ class Wall : public Node {
     xrot_limits[0] = -0.0; xrot_limits[1] = 0.0;
     yrot_limits[0] = -0.0; yrot_limits[1] = 0.0;
     zrot_limits[0] = -0.0; zrot_limits[1] = 0.0;
+
+    is_static = true;
 
     populateBuffers();
     setInitialTransformation();
