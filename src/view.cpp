@@ -37,6 +37,9 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
 
   // record mode
   mode = 0;
+  num_keyframes = 0;
+  curr_keyframe = 0;
+  curr_frame = 0;
 }
 
 void View::updateView(GLfloat h_width, GLfloat h_height) {
@@ -71,6 +74,16 @@ void View::initShadersGL() {
 void View::renderGL() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  if (mode == 1 && curr_keyframe + 1 < num_keyframes) {
+
+    curr_frame++;
+    curr_frame %= 120;
+
+    if (curr_frame == 0) {
+      curr_keyframe++;
+    }
+  }
+
   glUniform4fv(u_camera_position, 1, glm::value_ptr(glm::vec4(c_xpos, c_ypos, c_zpos, 1.0)));
   glUniform4fv(u_light_positions, 2, glm::value_ptr(light_positions[0]));
   glUniform4fv(u_spotlight_position, 2, glm::value_ptr(spotlight_position[0]));
@@ -78,7 +91,7 @@ void View::renderGL() {
   glUniformMatrix4fv(u_view_matrix, 1, GL_FALSE, glm::value_ptr(view_matrix));
 
   // buzz->render();
-  hamm->render();
+  hamm->render(mode, curr_keyframe, curr_frame);
 
   floor->render();
   walls->render();
@@ -227,5 +240,37 @@ void View::saveKeyframe() {
 
   key_file << "\n";
 
+  key_file.close();
   std::cout << "keyframe saved!\n";
+}
+
+void View::loadKeyframes() {
+  if (mode != 0)
+    return;
+
+  std::string file_name = "keyframes.txt";
+
+  std::fstream key_file;
+  key_file.open(file_name);
+
+  if (!key_file.is_open()) {
+    std::cout << "could not open keyframes.txt\n";
+    return;
+  }
+
+  while (1) {
+    hamm->loadKeyframe(key_file);
+
+    if (key_file.eof()) break;
+    num_keyframes++;
+  }
+
+  curr_keyframe = 0;
+  curr_frame = 0;
+
+  std::cout << "num_keyframes: " << num_keyframes << "\n";
+
+  key_file.close();
+
+  std::cout << "keyframes loaded!\n";
 }

@@ -215,15 +215,15 @@ class Hamm {
     curr_selected_node = 0;
   }
 
-  void render() {
-    torso->render();
-    head->render();
-    nose->render();
+  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
+    torso->render(mode, curr_keyframe, curr_frame);
+    head->render(mode, curr_keyframe, curr_frame);
+    nose->render(mode, curr_keyframe, curr_frame);
 
-    leg_fl->render();
-    leg_fr->render();
-    leg_bl->render();
-    leg_br->render();
+    leg_fl->render(mode, curr_keyframe, curr_frame);
+    leg_fr->render(mode, curr_keyframe, curr_frame);
+    leg_bl->render(mode, curr_keyframe, curr_frame);
+    leg_br->render(mode, curr_keyframe, curr_frame);
   }
 
   void rotate(GLuint axis, GLfloat angle) {
@@ -260,6 +260,24 @@ class Hamm {
 
   void saveKeyframe(std::fstream &key_file) {
     torso->saveKeyframe(key_file);
+    head->saveKeyframe(key_file);
+    nose->saveKeyframe(key_file);
+
+    leg_fl->saveKeyframe(key_file);
+    leg_fr->saveKeyframe(key_file);
+    leg_bl->saveKeyframe(key_file);
+    leg_br->saveKeyframe(key_file);
+  }
+
+  void loadKeyframe(std::fstream &key_file) {
+    torso->loadKeyframe(key_file);
+    head->loadKeyframe(key_file);
+    nose->loadKeyframe(key_file);
+
+    leg_fl->loadKeyframe(key_file);
+    leg_fr->loadKeyframe(key_file);
+    leg_bl->loadKeyframe(key_file);
+    leg_br->loadKeyframe(key_file);
   }
 };
 

@@ -37,7 +37,7 @@ class View {
   glm::vec4 spotlight_position[2];
   GLuint lights_state[3];
 
-  // Buzz *buzz;
+  Buzz *buzz;
   Hamm *hamm;
 
   Floor *floor;
@@ -56,6 +56,9 @@ class View {
    *  1 -> play mode
    */
   int mode;
+  int num_keyframes;
+  int curr_keyframe;
+  int curr_frame;
 
   void initShadersGL();
  public:
@@ -77,6 +80,7 @@ class View {
 
   void toggleMode();
   void saveKeyframe();
+  void loadKeyframes();
 };
 
 #endif  // VIEW_HPP_

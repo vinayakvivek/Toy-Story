@@ -106,7 +106,19 @@ void Node::updateModelMatrix(const glm::mat4 &transformation) {
   }
 }
 
-void Node::render() {
+void Node::render(int mode, int curr_keyframe, int curr_frame) {
+
+  if (mode == 1) {
+    glm::quat q1(glm::vec3(0, 0, 0));
+    glm::quat q2(keyframes[curr_keyframe + 1]);
+
+    glm::quat q_rot = glm::slerp(q1, q2, 1.0f / 120);
+    glm::mat4 rot_matrix = glm::mat4_cast(q_rot);
+
+    rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
+    updateModelMatrix(rot_matrix);
+  }
+
   glBindVertexArray(vao);
 
   // bind texture
@@ -184,4 +196,17 @@ void Node::saveKeyframe(std::fstream &key_file) {
   key_file << glm::radians(xrot - last_rot.x) << " "
            << glm::radians(yrot - last_rot.y) << " "
            << glm::radians(zrot - last_rot.z) << " ";
+  last_rot = glm::vec3(xrot, yrot, zrot);
+}
+
+void Node::loadKeyframe(std::fstream &key_file) {
+  GLfloat x = 0, y = 0, z = 0;
+  key_file >> x >> y >> z;
+  keyframes.push_back(glm::vec3(x, y, z));
+
+  // std::cout << "id: " << id << ", " << glm::to_string(glm::vec3(x, y, z)) << "\n";
+}
+
+void Node::clearKeyframes() {
+  keyframes.clear();
 }
