@@ -60,6 +60,12 @@ class View {
   int curr_keyframe;
   int curr_frame;
 
+  std::vector<glm::vec3> c_rot_keyframes;
+  std::vector<glm::vec3> c_pos_keyframes;
+  std::vector<glm::vec3> light_keyframes;
+  glm::vec3 last_c_rot;
+  glm::vec3 last_c_pos;
+
   void initShadersGL();
  public:
   View(GLfloat h_width, GLfloat h_height, GLfloat h_depth);
@@ -67,6 +73,7 @@ class View {
   void translateCamera(GLuint axis, GLfloat d);
   void zoom(GLfloat amount);
   void updateCamera();
+  void interpolateCamera();
   void renderGL();
 
   void toggleLight(int light_id);
@@ -80,7 +87,9 @@ class View {
 
   void toggleMode();
   void saveKeyframe();
+  void saveCameraKeyframe(std::fstream &key_file);
   void loadKeyframes();
+  void loadCameraKeyframes(std::fstream &key_file);
 };
 
 #endif  // VIEW_HPP_

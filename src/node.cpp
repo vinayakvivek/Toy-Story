@@ -213,8 +213,6 @@ void Node::saveKeyframe(std::fstream &key_file) {
              << (ypos - last_pos.y) << " "
              << (zpos - last_pos.z) << " ";
     last_pos = glm::vec3(xpos, ypos, zpos);
-
-    std::cout << "pos: " << glm::to_string(last_pos) << "\n";
   }
 
   for (Node *child : children) {
@@ -236,8 +234,6 @@ void Node::loadKeyframe(std::fstream &key_file) {
   for (Node *child : children) {
     child->loadKeyframe(key_file);
   }
-
-  // std::cout << "id: " << id << ", " << glm::to_string(glm::vec3(x, y, z)) << "\n";
 }
 
 Node::~Node() {

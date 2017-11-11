@@ -41,6 +41,9 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   curr_keyframe = 0;
   curr_frame = 0;
   loadKeyframes();
+
+  last_c_rot = glm::vec3(c_xrot, c_yrot, c_zrot);
+  last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
 }
 
 void View::updateView(GLfloat h_width, GLfloat h_height) {
@@ -80,6 +83,8 @@ void View::renderGL() {
     curr_frame++;
     curr_frame %= 120;
 
+    interpolateCamera();
+
     if (curr_frame == 0) {
       curr_keyframe++;
     }
@@ -98,6 +103,41 @@ void View::renderGL() {
   walls->render();
   ceiling->render();
   bulb->render();
+}
+
+void View::interpolateCamera() {
+  if (mode != 1)
+    return;
+
+  lights_state[0] = light_keyframes[curr_keyframe + 1].x;
+  lights_state[1] = light_keyframes[curr_keyframe + 1].y;
+  lights_state[2] = light_keyframes[curr_keyframe + 1].z;
+
+  glm::vec3 c_pos_vec = (1.0f / 120) * c_pos_keyframes[curr_keyframe + 1];
+  c_xpos += c_pos_vec.x;
+  c_ypos += c_pos_vec.y;
+  c_zpos += c_pos_vec.z;
+
+  glm::quat q1(glm::vec3(0, 0, 0));
+  glm::quat q2(c_rot_keyframes[curr_keyframe + 1]);
+
+  glm::quat q_rot = glm::slerp(q1, q2, 1.0f / 120);
+  glm::vec3 d_angles = glm::eulerAngles(q_rot);
+
+  c_xrot += glm::degrees(d_angles.x);
+  c_yrot += glm::degrees(d_angles.y);
+  c_zrot += glm::degrees(d_angles.z);
+
+  updateCamera();
+
+  // c_rotation_matrix = glm::mat4_cast(q_rot) * c_rotation_matrix;
+
+  // glm::vec4 c_pos = glm::vec4(c_xpos, c_ypos, c_zpos, 1.0) * c_rotation_matrix;
+  // glm::vec4 c_up = glm::vec4(c_up_x, c_up_y, c_up_z, 1.0) * c_rotation_matrix;
+
+  // // Creating the lookAt matrix
+  // glm::mat4 lookat_matrix = glm::lookAt(glm::vec3(c_pos), glm::vec3(0.0), glm::vec3(c_up));
+  // view_matrix = projection_matrix * lookat_matrix;
 }
 
 void View::updateCamera() {
@@ -237,6 +277,7 @@ void View::saveKeyframe() {
     return;
   }
 
+  saveCameraKeyframe(key_file);
   buzz->saveKeyframe(key_file);
   hamm->saveKeyframe(key_file);
 
@@ -263,6 +304,7 @@ void View::loadKeyframes() {
   num_keyframes = 0;
 
   while (1) {
+    loadCameraKeyframes(key_file);
     buzz->loadKeyframe(key_file);
     hamm->loadKeyframe(key_file);
 
@@ -278,4 +320,36 @@ void View::loadKeyframes() {
   key_file.close();
 
   std::cout << "keyframes loaded!\n";
+}
+
+void View::saveCameraKeyframe(std::fstream &key_file) {
+  // save light state
+  key_file << lights_state[0] << " "
+           << lights_state[1] << " "
+           << lights_state[2] << " ";
+
+  // camera position
+  key_file << (c_xpos - last_c_pos.x) << " "
+           << (c_ypos - last_c_pos.y) << " "
+           << (c_zpos - last_c_pos.z) << " ";
+  last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
+
+  // camera rotation
+  key_file << glm::radians(c_xrot - last_c_rot.x) << " "
+           << glm::radians(c_yrot - last_c_rot.y) << " "
+           << glm::radians(c_zrot - last_c_rot.z) << " ";
+  last_c_rot = glm::vec3(c_xrot, c_yrot, c_zrot);
+}
+
+void View::loadCameraKeyframes(std::fstream &key_file) {
+  GLuint l1 = 0, l2 = 0, l3 = 0;
+  key_file >> l1 >> l2 >> l3;
+  light_keyframes.push_back(glm::vec3(l1, l2, l3));
+
+  GLfloat x = 0, y = 0, z = 0;
+  key_file >> x >> y >> z;
+  c_pos_keyframes.push_back(glm::vec3(x, y, z));
+
+  key_file >> x >> y >> z;
+  c_rot_keyframes.push_back(glm::vec3(x, y, z));
 }
