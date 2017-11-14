@@ -40,7 +40,7 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   num_keyframes = 0;
   curr_keyframe = 0;
   curr_frame = 0;
-  // loadKeyframes();
+  loadKeyframes();
 
   last_c_rot = glm::vec3(c_xrot, c_yrot, c_zrot);
   last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
@@ -87,6 +87,7 @@ void View::renderGL() {
 
     if (curr_frame == 0) {
       curr_keyframe++;
+      std::cout << "camera: " << glm::to_string(glm::vec3(c_xrot, c_yrot, c_zrot)) << "\n";
     }
   }
 
@@ -355,6 +356,28 @@ void View::loadCameraKeyframes(std::fstream &key_file) {
 }
 
 void View::reset() {
+  std::cout << "resetting state..\n";
+
   hamm->reset();
   buzz->reset();
+
+  mode = 0;
+  std::cout << "record mode on.\n";
+
+  num_keyframes = 0;
+  curr_keyframe = 0;
+  curr_frame = 0;
+
+  c_rot_keyframes.clear();
+  c_rot_keyframes.clear();
+  light_keyframes.clear();
+  last_c_rot = glm::vec3(0.0f);
+  last_c_pos = glm::vec3(0.0f);
+
+  c_xpos = 0.0; c_ypos = 0.0; c_zpos = 700.0;
+  c_up_x = 0.0; c_up_y = 1.0; c_up_z = 0.0;
+  c_xrot = 0.0; c_yrot = 0.0; c_zrot = 0.0;
+
+  updateCamera();
+  loadKeyframes();
 }
