@@ -46,7 +46,8 @@ class Node {
   GLuint u_texture_sampler;
 
   // transformations
-  glm::mat4 local_matrix;  // for initial local transformations
+  glm::mat4 local_matrix;  // local transformations
+  glm::mat4 initial_matrix;
   glm::mat4 model_matrix;
   glm::mat4 normal_matrix;
 
@@ -87,7 +88,7 @@ class Node {
   void loadKeyframe(std::fstream &key_file);
 
   int getId() {return id;}
-  virtual ~Node();
+  void reset();
 };
 
 #endif  // _NODE_HPP_

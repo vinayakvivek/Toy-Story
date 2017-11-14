@@ -55,6 +55,9 @@ namespace toys {
     } else if (key == GLFW_KEY_M && action == GLFW_PRESS) {
       v->toggleMode();
       return;
+    } else if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+      v->reset();
+      return;
     } else if (key == GLFW_KEY_O && action == GLFW_PRESS) {
       v->saveKeyframe();
       return;

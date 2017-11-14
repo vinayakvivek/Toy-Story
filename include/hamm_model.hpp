@@ -10,8 +10,8 @@ class HammHead : public Node {
     updateModelMatrix(local_matrix, false);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 100.0f, 300.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -43,8 +43,8 @@ class HammTorso : public Node {
     updateModelMatrix(local_matrix, false);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(450.0f, -210.0f, -100.0f));
-    glm::mat4 initial_transformation = translate * glm::scale(glm::mat4(1.0f), 0.7f * glm::vec3(1.0f, 1.0f, 1.0f));
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate * glm::scale(glm::mat4(1.0f), 0.7f * glm::vec3(1.0f, 1.0f, 1.0f));
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -87,8 +87,8 @@ class HammNose : public Node {
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 100.0f, 0.0f));
     glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
-    glm::mat4 initial_transformation = rotate * translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = rotate * translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -143,7 +143,6 @@ class HammLeg : public Node {
     glm::mat4 rz;
     glm::mat4 rx;
     glm::mat4 r;
-    glm::mat4 initial_transformation;
 
     switch (id) {
       case 3:
@@ -151,32 +150,32 @@ class HammLeg : public Node {
         rz = glm::rotate(glm::mat4(1.0f), (float)PI, glm::vec3(0.0f, 0.0f, 1.0f));
         rx = glm::rotate(glm::mat4(1.0f), -(float)PI/4, glm::vec3(1.0f, 0.0f, 0.0f));
         r = glm::rotate(glm::mat4(1.0f), (float)PI/8, glm::vec3(0.0f, 1.0f, 1.0f));
-        initial_transformation = r * rx * t * rz;
-        updateModelMatrix(initial_transformation);
+        initial_matrix = r * rx * t * rz;
+        updateModelMatrix(initial_matrix);
         break;
       case 4:
         // front right
         rz = glm::rotate(glm::mat4(1.0f), -(float)PI, glm::vec3(0.0f, 0.0f, 1.0f));
         rx = glm::rotate(glm::mat4(1.0f), -(float)PI/4, glm::vec3(1.0f, 0.0f, 0.0f));
         r = glm::rotate(glm::mat4(1.0f), -(float)PI/8, glm::vec3(0.0f, 1.0f, 1.0f));
-        initial_transformation = r * rx * t * rz;
-        updateModelMatrix(initial_transformation);
+        initial_matrix = r * rx * t * rz;
+        updateModelMatrix(initial_matrix);
         break;
       case 5:
         // back left
         rz = glm::rotate(glm::mat4(1.0f), (float)PI, glm::vec3(0.0f, 0.0f, 1.0f));
         rx = glm::rotate(glm::mat4(1.0f), (float)PI/4, glm::vec3(1.0f, 0.0f, 0.0f));
         r = glm::rotate(glm::mat4(1.0f), (float)PI/8, glm::vec3(0.0f, 1.0f, -1.0f));
-        initial_transformation = r * rx * t * rz;
-        updateModelMatrix(initial_transformation);
+        initial_matrix = r * rx * t * rz;
+        updateModelMatrix(initial_matrix);
         break;
       case 6:
         // back right
         rz = glm::rotate(glm::mat4(1.0f), -(float)PI, glm::vec3(0.0f, 0.0f, 1.0f));
         rx = glm::rotate(glm::mat4(1.0f), (float)PI/4, glm::vec3(1.0f, 0.0f, 0.0f));
         r = glm::rotate(glm::mat4(1.0f), -(float)PI/8, glm::vec3(0.0f, 1.0f, -1.0f));
-        initial_transformation = r * rx * t * rz;
-        updateModelMatrix(initial_transformation);
+        initial_matrix = r * rx * t * rz;
+        updateModelMatrix(initial_matrix);
         break;
     }
   }
@@ -257,6 +256,10 @@ class Hamm {
 
   void loadKeyframe(std::fstream &key_file) {
     torso->loadKeyframe(key_file);
+  }
+
+  void reset() {
+    torso->reset();
   }
 };
 

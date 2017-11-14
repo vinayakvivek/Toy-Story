@@ -90,6 +90,8 @@ class View {
   void saveCameraKeyframe(std::fstream &key_file);
   void loadKeyframes();
   void loadCameraKeyframes(std::fstream &key_file);
+
+  void reset();
 };
 
 #endif  // VIEW_HPP_

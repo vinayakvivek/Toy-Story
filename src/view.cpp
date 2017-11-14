@@ -24,7 +24,7 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   initShadersGL();
 
   updateCamera();
-  buzz = new Buzz(shaderProgram);
+  // buzz = new Buzz(shaderProgram);
   hamm = new Hamm(shaderProgram);
 
   floor = new Floor("floor", 0, shaderProgram, NULL);
@@ -40,7 +40,7 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   num_keyframes = 0;
   curr_keyframe = 0;
   curr_frame = 0;
-  loadKeyframes();
+  // loadKeyframes();
 
   last_c_rot = glm::vec3(c_xrot, c_yrot, c_zrot);
   last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
@@ -96,7 +96,7 @@ void View::renderGL() {
   glUniform1uiv(u_lights_state, 3, &lights_state[0]);
   glUniformMatrix4fv(u_view_matrix, 1, GL_FALSE, glm::value_ptr(view_matrix));
 
-  buzz->render(mode, curr_keyframe, curr_frame);
+  // buzz->render(mode, curr_keyframe, curr_frame);
   hamm->render(mode, curr_keyframe, curr_frame);
 
   floor->render();
@@ -352,4 +352,8 @@ void View::loadCameraKeyframes(std::fstream &key_file) {
 
   key_file >> x >> y >> z;
   c_rot_keyframes.push_back(glm::vec3(x, y, z));
+}
+
+void View::reset() {
+  hamm->reset();
 }

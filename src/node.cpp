@@ -18,6 +18,7 @@ Node::Node(
   translatable = false;
 
   local_matrix = glm::mat4(1.0f);
+  initial_matrix = glm::mat4(1.0f);
   model_matrix = glm::mat4(1.0f);
   normal_matrix = glm::mat4(1.0f);
 
@@ -121,9 +122,17 @@ void Node::render(int mode, int curr_keyframe, int curr_frame) {
     rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
     updateModelMatrix(rot_matrix);
 
+    // xrot += glm::degrees(rot_keyframes[curr_keyframe + 1].x) / 120;
+    // yrot += glm::degrees(rot_keyframes[curr_keyframe + 1].y) / 120;
+    // zrot += glm::degrees(rot_keyframes[curr_keyframe + 1].z) / 120;
+
     if (translatable) {
-      glm::mat4 trans_matrix = glm::translate(glm::mat4(1.0f), (1.0f / 120) * pos_keyframes[curr_keyframe + 1]);
+      glm::vec3 trans_vec = (1.0f / 120) * pos_keyframes[curr_keyframe + 1];
+      glm::mat4 trans_matrix = glm::translate(glm::mat4(1.0f), trans_vec);
       trans_matrix = model_matrix * glm::inverse(local_matrix) * trans_matrix * local_matrix * glm::inverse(model_matrix);
+      xpos += trans_vec.x;
+      ypos += trans_vec.y;
+      zpos += trans_vec.z;
       updateModelMatrix(trans_matrix);
     }
   }
@@ -228,7 +237,6 @@ void Node::loadKeyframe(std::fstream &key_file) {
   if (translatable) {
     key_file >> x >> y >> z;
     pos_keyframes.push_back(glm::vec3(x, y, z));
-    std::cout << "pos: " << glm::to_string(glm::vec3(x, y, z)) << "\n";
   }
 
   for (Node *child : children) {
@@ -236,17 +244,13 @@ void Node::loadKeyframe(std::fstream &key_file) {
   }
 }
 
-Node::~Node() {
-  // for (int i = 0; i < children.size(); ++i) {
-  //   delete children[i];
-  // }
+void Node::reset() {
+  for (Node *child : children) {
+    child->reset();
+  }
 
-  glDeleteTextures(1, &tex);
-  glDeleteVertexArrays(1, &vao);
-  glDeleteBuffers(1, &vbo);
-
-  std::cout << "deleting id: " << id << "\n";
-
-  data->deleteData();
-  delete data;
+  model_matrix = initial_matrix * local_matrix;
+  for (Node *child : children) {
+    child->updateModelMatrix(initial_matrix);
+  }
 }
