@@ -14,8 +14,8 @@ class BuzzHead : public Node {
     updateModelMatrix(local_matrix);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 200 * 1.3 * 0.25 + 20.0f, 0.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -42,8 +42,8 @@ class BuzzHead : public Node {
 class BuzzNeck : public Node {
   void setInitialTransformation() {
     glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 130.0f, 0.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -76,8 +76,8 @@ class BuzzTorso : public Node {
     local_matrix *= scale * rotate;
     updateModelMatrix(local_matrix);
 
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -110,8 +110,8 @@ class BuzzHip : public Node {
     updateModelMatrix(local_matrix);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -100.0f, 0.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -155,8 +155,8 @@ class BuzzLeftUpperArm : public Node {
 
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(120.0f, 130.0f, 0.0f));
 
-    glm::mat4 initial_transformation = translate * rotate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate * rotate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -190,8 +190,8 @@ class BuzzRightUpperArm : public Node {
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(-120.0f, 130.0f, 0.0f));
 
 
-    glm::mat4 initial_transformation = translate * rotate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate * rotate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -221,8 +221,8 @@ class BuzzLowerArm : public Node {
     updateModelMatrix(local_matrix);
 
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 150.0f, 0.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -258,8 +258,8 @@ class BuzzLowerArm : public Node {
 class BuzzHand : public Node {
   void setInitialTransformation() {
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 130.0f, 0.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -290,8 +290,8 @@ class BuzzLeftThigh : public Node {
     glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)PI, glm::vec3(0.0f, 1.0f, 0.0f));
     rotate = glm::rotate(rotate, (float)PI, glm::vec3(1.0f, 0.0f, 0.0f));
 
-    glm::mat4 initial_transformation = translate * scale * rotate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate * scale * rotate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -322,8 +322,8 @@ class BuzzRightThigh : public Node {
     glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), (float)PI, glm::vec3(0.0f, 1.0f, 0.0f));
     rotate = glm::rotate(rotate, (float)PI, glm::vec3(1.0f, 0.0f, 0.0f));
 
-    glm::mat4 initial_transformation = translate * scale * rotate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate * scale * rotate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -350,8 +350,8 @@ class BuzzRightThigh : public Node {
 class BuzzLeg : public Node {
   void setInitialTransformation() {
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 150.0f, 0.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -378,8 +378,8 @@ class BuzzLeg : public Node {
 class BuzzFoot : public Node {
   void setInitialTransformation() {
     glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 150.0f, 15.0f));
-    glm::mat4 initial_transformation = translate;
-    updateModelMatrix(initial_transformation);
+    initial_matrix = translate;
+    updateModelMatrix(initial_matrix);
   }
 
  public:
@@ -474,6 +474,14 @@ class Buzz {
 
     curr_selected_node = 0;
 
+    setInitialPose();
+  }
+
+  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
+    hip->render(mode, curr_keyframe, curr_frame);
+  }
+
+  void setInitialPose() {
     left_upper_arm->rotate(1, 90.0f);
     left_upper_arm->rotate(0, 60.0f);
     left_lower_arm->rotate(0, -120.0f);
@@ -491,10 +499,6 @@ class Buzz {
     right_thigh->rotate(2, -5.0f);
     right_leg->rotate(0, -5.0f);
     right_foot->rotate(2, 5.0f);
-  }
-
-  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
-    hip->render(mode, curr_keyframe, curr_frame);
   }
 
   void rotate(GLuint axis, GLfloat angle) {
@@ -564,6 +568,11 @@ class Buzz {
 
   void loadKeyframe(std::fstream &key_file) {
     hip->loadKeyframe(key_file);
+  }
+
+  void reset() {
+    hip->reset();
+    setInitialPose();
   }
 };
 

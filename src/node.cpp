@@ -250,6 +250,13 @@ void Node::reset() {
   }
 
   model_matrix = initial_matrix * local_matrix;
+  xpos = ypos = zpos = 0;
+  xrot = yrot = zrot = 0;
+  rot_keyframes.clear();
+  pos_keyframes.clear();
+  last_pos = glm::vec3(0.0f);
+  last_rot = glm::vec3(0.0f);
+
   for (Node *child : children) {
     child->updateModelMatrix(initial_matrix);
   }

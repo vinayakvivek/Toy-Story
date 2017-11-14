@@ -24,7 +24,7 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   initShadersGL();
 
   updateCamera();
-  // buzz = new Buzz(shaderProgram);
+  buzz = new Buzz(shaderProgram);
   hamm = new Hamm(shaderProgram);
 
   floor = new Floor("floor", 0, shaderProgram, NULL);
@@ -96,7 +96,7 @@ void View::renderGL() {
   glUniform1uiv(u_lights_state, 3, &lights_state[0]);
   glUniformMatrix4fv(u_view_matrix, 1, GL_FALSE, glm::value_ptr(view_matrix));
 
-  // buzz->render(mode, curr_keyframe, curr_frame);
+  buzz->render(mode, curr_keyframe, curr_frame);
   hamm->render(mode, curr_keyframe, curr_frame);
 
   floor->render();
@@ -356,4 +356,5 @@ void View::loadCameraKeyframes(std::fstream &key_file) {
 
 void View::reset() {
   hamm->reset();
+  buzz->reset();
 }
