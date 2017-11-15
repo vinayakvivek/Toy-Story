@@ -39,10 +39,9 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   mode = 0;
   num_keyframes = 0;
   curr_keyframe = 0;
-  curr_frame = 0;
+  curr_frame = 1;
   loadKeyframes();
 
-  last_c_rot = glm::vec3(c_xrot, c_yrot, c_zrot);
   last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
 }
 
@@ -80,15 +79,20 @@ void View::renderGL() {
 
   if (mode == 1 && curr_keyframe + 1 < num_keyframes) {
 
-    curr_frame++;
-    curr_frame %= 120;
-
     interpolateCamera();
 
-    if (curr_frame == 0) {
+    curr_frame++;
+
+    if (curr_frame == 120) {
+      curr_frame = 1;
       curr_keyframe++;
-      std::cout << "camera: " << glm::to_string(glm::vec3(c_xrot, c_yrot, c_zrot)) << "\n";
+
+      c_xrot = c_rot_keyframes[curr_keyframe].x;
+      c_yrot = c_rot_keyframes[curr_keyframe].y;
+      c_zrot = c_rot_keyframes[curr_keyframe].z;
     }
+  } else if (mode == 1) {
+    updateCamera();
   }
 
   glUniform4fv(u_camera_position, 1, glm::value_ptr(glm::vec4(c_xpos, c_ypos, c_zpos, 1.0)));
@@ -106,6 +110,43 @@ void View::renderGL() {
   bulb->render();
 }
 
+glm::quat rotateTowards(glm::quat q1, glm::quat q2, GLfloat maxAngle){
+
+  if( maxAngle < 0.001f ){
+    // No rotation allowed. Prevent dividing by 0 later.
+    return q1;
+  }
+
+  GLfloat cosTheta = glm::dot(q1, q2);
+
+  // q1 and q2 are already equal.
+  // Force q2 just to be sure
+  if(cosTheta > 0.9999f){
+    return q2;
+  }
+
+  // Avoid taking the long path around the sphere
+  if (cosTheta < 0){
+      q1 = q1*-1.0f;
+      cosTheta *= -1.0f;
+  }
+
+  GLfloat angle = acos(cosTheta);
+
+  // If there is only a 2&deg; difference, and we are allowed 5&deg;,
+  // then we arrived.
+  if (angle < maxAngle){
+    return q2;
+  }
+
+  GLfloat fT = maxAngle / angle;
+  angle = maxAngle;
+
+  glm::quat res = (sin((1.0f - fT) * angle) * q1 + sin(fT * angle) * q2) / sin(angle);
+  res = glm::normalize(res);
+  return res;
+}
+
 void View::interpolateCamera() {
   if (mode != 1)
     return;
@@ -119,33 +160,29 @@ void View::interpolateCamera() {
   c_ypos += c_pos_vec.y;
   c_zpos += c_pos_vec.z;
 
-  glm::quat q1(glm::vec3(0, 0, 0));
+  glm::quat q1(c_rot_keyframes[curr_keyframe]);
   glm::quat q2(c_rot_keyframes[curr_keyframe + 1]);
 
-  glm::quat q_rot = glm::slerp(q1, q2, 1.0f / 120);
-  glm::vec3 d_angles = glm::eulerAngles(q_rot);
+  glm::quat q_rot = glm::mix(q1, q2, curr_frame / 120.0f);
+  // GLfloat angle = acos(glm::dot(q1, q2));
+  // glm::quat q_rot = rotateTowards(q1, q2, curr_frame * angle / 120.0f);
+  c_rotation_matrix = glm::mat4_cast(q_rot);
 
-  c_xrot += glm::degrees(d_angles.x);
-  c_yrot += glm::degrees(d_angles.y);
-  c_zrot += glm::degrees(d_angles.z);
+  glm::vec4 c_pos = glm::vec4(c_xpos, c_ypos, c_zpos, 1.0) * c_rotation_matrix;
+  glm::vec4 c_up = glm::vec4(c_up_x, c_up_y, c_up_z, 1.0) * c_rotation_matrix;
 
-  updateCamera();
-
-  // c_rotation_matrix = glm::mat4_cast(q_rot) * c_rotation_matrix;
-
-  // glm::vec4 c_pos = glm::vec4(c_xpos, c_ypos, c_zpos, 1.0) * c_rotation_matrix;
-  // glm::vec4 c_up = glm::vec4(c_up_x, c_up_y, c_up_z, 1.0) * c_rotation_matrix;
-
-  // // Creating the lookAt matrix
-  // glm::mat4 lookat_matrix = glm::lookAt(glm::vec3(c_pos), glm::vec3(0.0), glm::vec3(c_up));
-  // view_matrix = projection_matrix * lookat_matrix;
+  // Creating the lookAt matrix
+  glm::mat4 lookat_matrix = glm::lookAt(glm::vec3(c_pos), glm::vec3(0.0), glm::vec3(c_up));
+  view_matrix = projection_matrix * lookat_matrix;
 }
 
 void View::updateCamera() {
   // Creating the lookAt and the up vectors for the camera
-  c_rotation_matrix = glm::rotate(glm::mat4(1.0f), glm::radians(c_xrot), glm::vec3(1.0f,0.0f,0.0f));
-  c_rotation_matrix = glm::rotate(c_rotation_matrix, glm::radians(c_yrot), glm::vec3(0.0f,1.0f,0.0f));
-  c_rotation_matrix = glm::rotate(c_rotation_matrix, glm::radians(c_zrot), glm::vec3(0.0f,0.0f,1.0f));
+  // c_rotation_matrix = glm::rotate(glm::mat4(1.0f), c_xrot, glm::vec3(1.0f,0.0f,0.0f));
+  // c_rotation_matrix = glm::rotate(c_rotation_matrix, c_yrot, glm::vec3(0.0f,1.0f,0.0f));
+  // c_rotation_matrix = glm::rotate(c_rotation_matrix, c_zrot, glm::vec3(0.0f,0.0f,1.0f));
+
+  c_rotation_matrix = glm::mat4_cast(glm::quat(glm::vec3(c_xrot, c_yrot, c_zrot)));
 
   glm::vec4 c_pos = glm::vec4(c_xpos, c_ypos, c_zpos, 1.0) * c_rotation_matrix;
   glm::vec4 c_up = glm::vec4(c_up_x, c_up_y, c_up_z, 1.0) * c_rotation_matrix;
@@ -166,6 +203,7 @@ void View::updateCamera() {
 }
 
 void View::rotateCamera(GLuint axis, GLfloat angle) {
+  angle = glm::radians(angle);
   switch (axis) {
     case 0:
       // X axis
@@ -262,6 +300,7 @@ void View::zoom(GLfloat amount) {
 
 void View::toggleMode() {
   mode = !mode;
+  mode == 0 ? std::cout << "record mode on.\n" : std::cout << "play mode on.\n";
 }
 
 void View::saveKeyframe() {
@@ -336,10 +375,9 @@ void View::saveCameraKeyframe(std::fstream &key_file) {
   last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
 
   // camera rotation
-  key_file << glm::radians(c_xrot - last_c_rot.x) << " "
-           << glm::radians(c_yrot - last_c_rot.y) << " "
-           << glm::radians(c_zrot - last_c_rot.z) << " ";
-  last_c_rot = glm::vec3(c_xrot, c_yrot, c_zrot);
+  key_file << c_xrot << " "
+           << c_yrot << " "
+           << c_zrot << " ";
 }
 
 void View::loadCameraKeyframes(std::fstream &key_file) {
@@ -366,12 +404,11 @@ void View::reset() {
 
   num_keyframes = 0;
   curr_keyframe = 0;
-  curr_frame = 0;
+  curr_frame = 1;
 
   c_rot_keyframes.clear();
   c_rot_keyframes.clear();
   light_keyframes.clear();
-  last_c_rot = glm::vec3(0.0f);
   last_c_pos = glm::vec3(0.0f);
 
   c_xpos = 0.0; c_ypos = 0.0; c_zpos = 700.0;

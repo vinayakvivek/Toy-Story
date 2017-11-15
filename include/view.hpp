@@ -28,7 +28,7 @@ class View {
   // Camera position and rotation Parameters
   GLfloat c_xpos, c_ypos, c_zpos;
   GLfloat c_up_x, c_up_y, c_up_z;
-  GLfloat c_xrot, c_yrot, c_zrot;
+  GLfloat c_xrot, c_yrot, c_zrot;   // in radians
 
   // Enable/Disable perspective view
   bool enable_perspective;
@@ -63,7 +63,6 @@ class View {
   std::vector<glm::vec3> c_rot_keyframes;
   std::vector<glm::vec3> c_pos_keyframes;
   std::vector<glm::vec3> light_keyframes;
-  glm::vec3 last_c_rot;
   glm::vec3 last_c_pos;
 
   void initShadersGL();

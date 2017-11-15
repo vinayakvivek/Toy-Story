@@ -250,6 +250,7 @@ void Node::reset() {
   }
 
   model_matrix = initial_matrix * local_matrix;
+  normal_matrix = glm::transpose(glm::inverse(model_matrix));
   xpos = ypos = zpos = 0;
   xrot = yrot = zrot = 0;
   rot_keyframes.clear();
