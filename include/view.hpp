@@ -29,6 +29,7 @@ class View {
   GLfloat c_xpos, c_ypos, c_zpos;
   GLfloat c_up_x, c_up_y, c_up_z;
   GLfloat c_xrot, c_yrot, c_zrot;   // in radians
+  glm::vec4 bezier_control_points[4];
 
   // Enable/Disable perspective view
   bool enable_perspective;
@@ -91,6 +92,8 @@ class View {
   void loadCameraKeyframes(std::fstream &key_file);
 
   void reset();
+  glm::vec4 bezierPoint(GLfloat);
+  void loadBezierControlPoints();
 };
 
 #endif  // VIEW_HPP_

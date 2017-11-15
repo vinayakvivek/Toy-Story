@@ -45,6 +45,12 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   loadKeyframes();
 
   last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
+
+  bezier_control_points[0] = glm::vec4(0.0, 0.0, 600.0, 1.0);
+  bezier_control_points[0] = glm::vec4(-400.0, 0.0, 1000.0, 1.0);
+  bezier_control_points[0] = glm::vec4(-400.0, 400.0, 1200.0, 1.0);
+  bezier_control_points[0] = glm::vec4(0.0, 0.0, 1200.0, 1.0);
+  loadBezierControlPoints();
 }
 
 void View::updateView(GLfloat h_width, GLfloat h_height) {
@@ -76,6 +82,40 @@ void View::initShadersGL() {
   u_lights_state = glGetUniformLocation(shaderProgram, "uLightsState");
 }
 
+void View::loadBezierControlPoints() {
+  std::string file_name = "bezier.txt";
+
+  std::fstream f;
+  f.open(file_name);
+
+  if (!f.is_open()) {
+    std::cout << "could not open bezier.txt\n";
+    return;
+  }
+
+  GLfloat x, y, z;
+  for (int i = 0; i < 4; ++i) {
+    f >> x >> y >> z;
+    bezier_control_points[i] = glm::vec4(x, y, z, 1.0f);
+  }
+}
+
+glm::vec4 View::bezierPoint(GLfloat t) {
+
+  glm::vec4 b(
+      pow(1 - t, 3),
+      3 * t * pow(1 - t, 2),
+      3 * t * t * (1 - t),
+      t * t * t
+    );
+
+  glm::vec4 p(0.0);
+  for (int i = 0; i < 4; ++i) {
+    p += bezier_control_points[i] * b[i];
+  }
+  return p;
+}
+
 void View::renderGL() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -93,7 +133,15 @@ void View::renderGL() {
       c_yrot = c_rot_keyframes[curr_keyframe].y;
       c_zrot = c_rot_keyframes[curr_keyframe].z;
     }
-  } else if (mode == 1) {
+  } else if (mode == 1 && curr_frame < 240) {
+    // updateCamera();
+
+    glm::vec4 p = bezierPoint(curr_frame / 240.0f);
+    c_xpos = p.x;
+    c_ypos = p.y;
+    c_zpos = p.z;
+
+    curr_frame++;
     updateCamera();
   }
 
@@ -110,43 +158,6 @@ void View::renderGL() {
   walls->render();
   ceiling->render();
   bulb->render();
-}
-
-glm::quat rotateTowards(glm::quat q1, glm::quat q2, GLfloat maxAngle){
-
-  if( maxAngle < 0.001f ){
-    // No rotation allowed. Prevent dividing by 0 later.
-    return q1;
-  }
-
-  GLfloat cosTheta = glm::dot(q1, q2);
-
-  // q1 and q2 are already equal.
-  // Force q2 just to be sure
-  if(cosTheta > 0.9999f){
-    return q2;
-  }
-
-  // Avoid taking the long path around the sphere
-  if (cosTheta < 0){
-      q1 = q1*-1.0f;
-      cosTheta *= -1.0f;
-  }
-
-  GLfloat angle = acos(cosTheta);
-
-  // If there is only a 2&deg; difference, and we are allowed 5&deg;,
-  // then we arrived.
-  if (angle < maxAngle){
-    return q2;
-  }
-
-  GLfloat fT = maxAngle / angle;
-  angle = maxAngle;
-
-  glm::quat res = (sin((1.0f - fT) * angle) * q1 + sin(fT * angle) * q2) / sin(angle);
-  res = glm::normalize(res);
-  return res;
 }
 
 void View::interpolateCamera() {
@@ -338,12 +349,14 @@ void View::loadKeyframes() {
   std::fstream key_file;
   key_file.open(file_name);
 
+  num_keyframes = 0;
+  curr_keyframe = 0;
+  curr_frame = 0;
+
   if (!key_file.is_open()) {
     std::cout << "could not open keyframes.txt\n";
     return;
   }
-
-  num_keyframes = 0;
 
   while (1) {
     loadCameraKeyframes(key_file);
@@ -353,9 +366,6 @@ void View::loadKeyframes() {
     if (key_file.eof()) break;
     num_keyframes++;
   }
-
-  curr_keyframe = 0;
-  curr_frame = 0;
 
   std::cout << "num_keyframes: " << num_keyframes << "\n";
 
