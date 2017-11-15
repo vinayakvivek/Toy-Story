@@ -8,6 +8,8 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   c_xpos = 0.0; c_ypos = 0.0; c_zpos = 700.0;
   c_up_x = 0.0; c_up_y = 1.0; c_up_z = 0.0;
   c_xrot = 0.0; c_yrot = 0.0; c_zrot = 0.0;
+  c_rotation_matrix = glm::mat4(1.0f);
+  c_trans_matrix = glm::mat4(1.0f);
 
   enable_perspective = true;
 

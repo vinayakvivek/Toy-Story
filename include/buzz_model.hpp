@@ -392,7 +392,6 @@ class BuzzFoot : public Node {
     tex = LoadTexture("../images/buzz/palm.bmp", 256, 256);
     data = cuboid(32, 40, 15);
     pivot_point = glm::vec4(0.0, 0.0, -20.0, 1.0);
-    // std::cout << "num_vertices: " << data->num_vertices << "\n";
 
     xrot_limits[0] = -10.0; xrot_limits[1] = 40.0;
     yrot_limits[0] = -0.0; yrot_limits[1] = 0.0;

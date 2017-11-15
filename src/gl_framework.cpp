@@ -117,7 +117,7 @@ namespace toys {
 
       case GLFW_KEY_PAGE_DOWN:
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-          v->translateCamera(0, -20);
+          v->translateCamera(2, -20);
         else
           v->rotateCamera(2, -1);
         break;
