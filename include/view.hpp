@@ -94,6 +94,8 @@ class View {
   void reset();
   glm::vec4 bezierPoint(GLfloat);
   void loadBezierControlPoints();
+
+  void captureFrame();
 };
 
 #endif  // VIEW_HPP_

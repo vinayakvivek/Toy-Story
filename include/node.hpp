@@ -20,6 +20,7 @@
 #define BUFFER_OFFSET(offset) (reinterpret_cast<void *>(offset))
 #define PI 3.14159265
 #define deg_to_rad(a) (a * PI / 180.0)
+#define KEYFRAME_GAP 60
 
 class Node {
  protected:
@@ -86,6 +87,7 @@ class Node {
   void saveKeyframe(std::fstream &key_file);
   void clearKeyframes();
   void loadKeyframe(std::fstream &key_file);
+  void setRotAfterKeyframe(int curr_keyframe);
 
   int getId() {return id;}
   void reset();

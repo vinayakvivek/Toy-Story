@@ -473,7 +473,7 @@ class Buzz {
 
     curr_selected_node = 0;
 
-    setInitialPose();
+    // setInitialPose();
   }
 
   void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
@@ -571,7 +571,7 @@ class Buzz {
 
   void reset() {
     hip->reset();
-    setInitialPose();
+    // setInitialPose();
   }
 };
 

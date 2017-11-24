@@ -116,18 +116,15 @@ void Node::render(int mode, int curr_keyframe, int curr_frame) {
     glm::quat q1(glm::vec3(0, 0, 0));
     glm::quat q2(rot_keyframes[curr_keyframe + 1]);
 
-    glm::quat q_rot = glm::slerp(q1, q2, 1.0f / 120);
+    glm::quat q_rot = glm::slerp(q1, q2, 1.0f / KEYFRAME_GAP);
     glm::mat4 rot_matrix = glm::mat4_cast(q_rot);
 
     rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
     updateModelMatrix(rot_matrix);
 
-    // xrot += glm::degrees(rot_keyframes[curr_keyframe + 1].x) / 120;
-    // yrot += glm::degrees(rot_keyframes[curr_keyframe + 1].y) / 120;
-    // zrot += glm::degrees(rot_keyframes[curr_keyframe + 1].z) / 120;
 
     if (translatable) {
-      glm::vec3 trans_vec = (1.0f / 120) * pos_keyframes[curr_keyframe + 1];
+      glm::vec3 trans_vec = (1.0f / KEYFRAME_GAP) * pos_keyframes[curr_keyframe + 1];
       glm::mat4 trans_matrix = glm::translate(glm::mat4(1.0f), trans_vec);
       trans_matrix = model_matrix * glm::inverse(local_matrix) * trans_matrix * local_matrix * glm::inverse(model_matrix);
       xpos += trans_vec.x;

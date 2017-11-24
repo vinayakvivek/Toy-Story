@@ -44,13 +44,15 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   curr_frame = 1;
   loadKeyframes();
 
-  last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
+  last_c_pos = glm::vec3(0.0);
 
   bezier_control_points[0] = glm::vec4(0.0, 0.0, 600.0, 1.0);
   bezier_control_points[0] = glm::vec4(-400.0, 0.0, 1000.0, 1.0);
-  bezier_control_points[0] = glm::vec4(-400.0, 400.0, 1200.0, 1.0);
-  bezier_control_points[0] = glm::vec4(0.0, 0.0, 1200.0, 1.0);
+  bezier_control_points[0] = glm::vec4(-400.0, 400.0, 1300.0, 1.0);
+  bezier_control_points[0] = glm::vec4(0.0, 0.0, 1300.0, 1.0);
   loadBezierControlPoints();
+
+  std::cout << "view initialization done.\n";
 }
 
 void View::updateView(GLfloat h_width, GLfloat h_height) {
@@ -122,28 +124,35 @@ void View::renderGL() {
   if (mode == 1 && curr_keyframe + 1 < num_keyframes) {
 
     interpolateCamera();
+    captureFrame();
 
     curr_frame++;
 
-    if (curr_frame == 120) {
+    if (curr_frame == KEYFRAME_GAP) {
       curr_frame = 1;
       curr_keyframe++;
 
       c_xrot = c_rot_keyframes[curr_keyframe].x;
       c_yrot = c_rot_keyframes[curr_keyframe].y;
       c_zrot = c_rot_keyframes[curr_keyframe].z;
+
+      c_xpos = c_pos_keyframes[curr_keyframe].x;
+      c_ypos = c_pos_keyframes[curr_keyframe].y;
+      c_zpos = c_pos_keyframes[curr_keyframe].z;
+
+      std::cout << glm::to_string(glm::vec3(c_xpos, c_ypos, c_zpos)) << "\n";
     }
-  } else if (mode == 1 && curr_frame < 240) {
+  } //else if (mode == 1 && curr_frame < 240) {
     // updateCamera();
 
-    glm::vec4 p = bezierPoint(curr_frame / 240.0f);
-    c_xpos = p.x;
-    c_ypos = p.y;
-    c_zpos = p.z;
+    // glm::vec4 p = bezierPoint(curr_frame / 240.0f);
+    // c_xpos = p.x;
+    // c_ypos = p.y;
+    // c_zpos = p.z;
 
-    curr_frame++;
-    updateCamera();
-  }
+    // curr_frame++;
+    // updateCamera();
+  //}
 
   glUniform4fv(u_camera_position, 1, glm::value_ptr(glm::vec4(c_xpos, c_ypos, c_zpos, 1.0)));
   glUniform4fv(u_light_positions, 2, glm::value_ptr(light_positions[0]));
@@ -168,7 +177,7 @@ void View::interpolateCamera() {
   lights_state[1] = light_keyframes[curr_keyframe + 1].y;
   lights_state[2] = light_keyframes[curr_keyframe + 1].z;
 
-  glm::vec3 c_pos_vec = (1.0f / 120) * c_pos_keyframes[curr_keyframe + 1];
+  glm::vec3 c_pos_vec = (1.0f / KEYFRAME_GAP) * (c_pos_keyframes[curr_keyframe + 1] - c_pos_keyframes[curr_keyframe]);
   c_xpos += c_pos_vec.x;
   c_ypos += c_pos_vec.y;
   c_zpos += c_pos_vec.z;
@@ -176,9 +185,9 @@ void View::interpolateCamera() {
   glm::quat q1(c_rot_keyframes[curr_keyframe]);
   glm::quat q2(c_rot_keyframes[curr_keyframe + 1]);
 
-  glm::quat q_rot = glm::mix(q1, q2, curr_frame / 120.0f);
+  glm::quat q_rot = glm::mix(q1, q2, curr_frame * 1.0f / KEYFRAME_GAP);
   // GLfloat angle = acos(glm::dot(q1, q2));
-  // glm::quat q_rot = rotateTowards(q1, q2, curr_frame * angle / 120.0f);
+  // glm::quat q_rot = rotateTowards(q1, q2, curr_frame * angle / KEYFRAME_GAP);
   c_rotation_matrix = glm::mat4_cast(q_rot);
 
   glm::vec4 c_pos = glm::vec4(c_xpos, c_ypos, c_zpos, 1.0) * c_rotation_matrix;
@@ -187,6 +196,34 @@ void View::interpolateCamera() {
   // Creating the lookAt matrix
   glm::mat4 lookat_matrix = glm::lookAt(glm::vec3(c_pos), glm::vec3(0.0), glm::vec3(c_up));
   view_matrix = projection_matrix * lookat_matrix;
+}
+
+void View::captureFrame() {
+
+  std::cout << "capturing frame.\n";
+
+  // global pointer float *pRGB
+  GLuint screen_width = 2 * half_width;
+  GLuint screen_height = 2 * half_height;
+
+  unsigned char *pRGB = new unsigned char [3 * (screen_width + 1) * (screen_height + 1) ];
+
+  // set the framebuffer to read
+  // default for double buffered
+  glReadBuffer(GL_FRONT);
+  glPixelStoref(GL_PACK_ALIGNMENT, 1);   // for word alignment
+
+  glReadPixels(half_width, half_height, screen_width, screen_height, GL_RGB, GL_UNSIGNED_BYTE, pRGB);
+  char filename[200];
+  sprintf(filename, "./frames/frame_%04d.ppm", curr_keyframe * (KEYFRAME_GAP - 1) + curr_frame);
+  std::ofstream out(filename, std::ios::out);
+  out << "P6" << std::endl;
+  out << screen_width << " " << screen_height << " 255" << std::endl;
+  out.write(reinterpret_cast<char const *>(pRGB), (3 * (screen_width + 1) * (screen_height + 1)) * sizeof(int));
+  out.close();
+
+  //function to store pRGB in a file named count
+  delete [] pRGB;
 }
 
 void View::updateCamera() {
@@ -384,7 +421,7 @@ void View::saveCameraKeyframe(std::fstream &key_file) {
   key_file << (c_xpos - last_c_pos.x) << " "
            << (c_ypos - last_c_pos.y) << " "
            << (c_zpos - last_c_pos.z) << " ";
-  last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
+  // last_c_pos = glm::vec3(c_xpos, c_ypos, c_zpos);
 
   // camera rotation
   key_file << c_xrot << " "

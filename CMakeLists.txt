@@ -39,4 +39,17 @@ add_custom_target(
         COMMENT "Copying shader files for target: ${target}" VERBATIM
         )
 
+add_custom_target(
+        copy_files
+        COMMAND ${CMAKE_COMMAND} -E copy
+                       ${CMAKE_SOURCE_DIR}/bezier.txt
+                       ${CMAKE_CURRENT_BINARY_DIR}/bezier.txt
+        COMMAND ${CMAKE_COMMAND} -E copy
+                       ${CMAKE_SOURCE_DIR}/convert.sh
+                       ${CMAKE_CURRENT_BINARY_DIR}/convert.sh
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/frames
+        COMMENT "Copying files for target: ${target}" VERBATIM
+        )
+
 add_dependencies(${target} copy_shader_files)
+add_dependencies(${target} copy_files)
