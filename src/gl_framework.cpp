@@ -3,6 +3,7 @@
 
 extern View *v;
 extern GLfloat half_width, half_height, half_depth;
+extern int mode;
 
 namespace toys {
 
@@ -54,6 +55,7 @@ namespace toys {
       return;
     } else if (key == GLFW_KEY_M && action == GLFW_PRESS) {
       v->toggleMode();
+      mode = !mode;
       return;
     } else if (key == GLFW_KEY_R && action == GLFW_PRESS) {
       v->reset();

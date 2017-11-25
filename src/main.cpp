@@ -4,6 +4,7 @@
 
 GLfloat half_width = 400, half_height = 400, half_depth = 10000;
 View *v;
+int mode = 0;
 
 void initView() {
   v = new View(half_width, half_height, half_depth);
@@ -65,8 +66,22 @@ int main(int argc, char** argv) {
   toys::initGL();
   initView();
 
+  double lastTime = glfwGetTime();
+  int nbFrames = 0;
+
   // Loop until the user closes the window
   while (glfwWindowShouldClose(window) == 0) {
+
+    // Measure speed
+    double currentTime = glfwGetTime();
+    nbFrames++;
+    if (currentTime - lastTime >= 1.0){
+      // printf and reset timer
+      if (mode == 1)
+        std::cout << "fps: " << nbFrames << "\n";
+      nbFrames = 0;
+      lastTime += 1.0;
+    }
 
     // Render here
     v->renderGL();

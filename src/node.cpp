@@ -122,6 +122,7 @@ void Node::render(int mode, int curr_keyframe, int curr_frame, int keyframe_gap)
     rot_matrix = model_matrix * glm::inverse(local_matrix) * rot_matrix * local_matrix * glm::inverse(model_matrix);
     updateModelMatrix(rot_matrix);
 
+    // std::cout << keyframe_gap << "\n";
 
     if (translatable) {
       glm::vec3 trans_vec = (1.0f / keyframe_gap) * pos_keyframes[curr_keyframe + 1];
@@ -146,7 +147,7 @@ void Node::render(int mode, int curr_keyframe, int curr_frame, int keyframe_gap)
   glDrawArrays(GL_TRIANGLES, 0, data->num_vertices);
 
   for (Node *child : children) {
-    child->render(mode, curr_keyframe, curr_frame);
+    child->render(mode, curr_keyframe, curr_frame, keyframe_gap);
   }
 }
 

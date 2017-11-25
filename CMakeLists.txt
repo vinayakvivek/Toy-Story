@@ -42,6 +42,9 @@ add_custom_target(
 add_custom_target(
         copy_files
         COMMAND ${CMAKE_COMMAND} -E copy
+                       ${CMAKE_SOURCE_DIR}/keyframes.txt
+                       ${CMAKE_CURRENT_BINARY_DIR}/keyframes.txt
+        COMMAND ${CMAKE_COMMAND} -E copy
                        ${CMAKE_SOURCE_DIR}/bezier.txt
                        ${CMAKE_CURRENT_BINARY_DIR}/bezier.txt
         COMMAND ${CMAKE_COMMAND} -E copy

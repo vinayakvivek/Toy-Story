@@ -62,6 +62,7 @@ class View {
   int curr_frame;
   int total_frame_count;
   int keyframe_gap;
+  bool capture_frame;
 
   std::vector<GLuint> keyframe_length;
   std::vector<glm::vec3> c_rot_keyframes;

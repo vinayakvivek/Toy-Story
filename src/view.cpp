@@ -42,6 +42,7 @@ View::View(GLfloat h_width, GLfloat h_height, GLfloat h_depth) {
   num_keyframes = 0;
   curr_keyframe = 0;
   curr_frame = 1;
+  capture_frame = false;
   loadKeyframes();
 
   last_c_pos = glm::vec3(0.0);
@@ -126,7 +127,9 @@ void View::renderGL() {
   if (mode == 1 && curr_keyframe + 1 < num_keyframes) {
 
     interpolateCamera();
-    // captureFrame();
+
+    if (capture_frame)
+      captureFrame();
 
     curr_frame++;
 
@@ -135,6 +138,7 @@ void View::renderGL() {
       curr_keyframe++;
 
       keyframe_gap = keyframe_length[curr_keyframe];
+      std::cout << keyframe_gap << "\n";
 
       c_xrot = c_rot_keyframes[curr_keyframe].x;
       c_yrot = c_rot_keyframes[curr_keyframe].y;
@@ -142,21 +146,24 @@ void View::renderGL() {
 
       c_xpos = c_pos_keyframes[curr_keyframe].x;
       c_ypos = c_pos_keyframes[curr_keyframe].y;
-      c_zpos = c_pos_keyframes[curr_keyframe].z;
-
-      std::cout << glm::to_string(glm::vec3(c_xpos, c_ypos, c_zpos)) << "\n";
+      c_zpos = c_pos_keyframes[curr_keyframe].z
     }
-  } //else if (mode == 1 && curr_frame < 240) {
-    // updateCamera();
+  } else if (mode == 1 && curr_frame < 240) {
 
-    // glm::vec4 p = bezierPoint(curr_frame / 240.0f);
-    // c_xpos = p.x;
-    // c_ypos = p.y;
-    // c_zpos = p.z;
+    if (capture_frame)
+      captureFrame();
 
-    // curr_frame++;
-    // updateCamera();
-  //}
+    c_xrot = 0.0; c_yrot = 0.0; c_zrot = 0.0;
+    c_rotation_matrix = glm::mat4(1.0f);
+
+    glm::vec4 p = bezierPoint(curr_frame / 240.0f);
+    c_xpos = p.x;
+    c_ypos = p.y;
+    c_zpos = p.z;
+
+    curr_frame++;
+    updateCamera();
+  }
 
   glUniform4fv(u_camera_position, 1, glm::value_ptr(glm::vec4(c_xpos, c_ypos, c_zpos, 1.0)));
   glUniform4fv(u_light_positions, 2, glm::value_ptr(light_positions[0]));
