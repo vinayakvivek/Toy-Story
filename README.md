@@ -10,7 +10,7 @@
 ```
 - if build succeeds, an executable `toys` will be created in `build/`
 - `keyframes.txt` contains saved keyframes
-- `bezier.txt` contains 4 control points of the bezier curve
+- **[extra]** `bezier.txt` contains 4 control points of the bezier curve
     - camera moves along this bezier curve, once all the keyframes are completed.
 - to **capture frames** in play mode, make `capture_frame = true` in `View::View()` in `view.cpp`.
     - these frames would be saved in `build/frames` as `frame_<id>.ppm`

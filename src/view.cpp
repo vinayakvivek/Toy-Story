@@ -138,7 +138,6 @@ void View::renderGL() {
       curr_keyframe++;
 
       keyframe_gap = keyframe_length[curr_keyframe];
-      std::cout << keyframe_gap << "\n";
 
       c_xrot = c_rot_keyframes[curr_keyframe].x;
       c_yrot = c_rot_keyframes[curr_keyframe].y;
@@ -146,7 +145,7 @@ void View::renderGL() {
 
       c_xpos = c_pos_keyframes[curr_keyframe].x;
       c_ypos = c_pos_keyframes[curr_keyframe].y;
-      c_zpos = c_pos_keyframes[curr_keyframe].z
+      c_zpos = c_pos_keyframes[curr_keyframe].z;
     }
   } else if (mode == 1 && curr_frame < 240) {
 
