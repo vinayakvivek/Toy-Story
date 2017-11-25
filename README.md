@@ -9,8 +9,22 @@
 	make
 ```
 - if build succeeds, an executable `toys` will be created in `build/`
+- `keyframes.txt` contains saved keyframes
+- `bezier.txt` contains 4 control points of the bezier curve
+    - camera moves along this bezier curve, once all the keyframes are completed.
+- to **capture frames** in play mode, make `capture_frame = true` in `View::View()` in `view.cpp`.
+    - these frames would be saved in `build/frames` as `frame_<id>.ppm`
+- `convert.sh` is a script to process the saved frames and combine them to create a video.
+
+### Keyframe format
+- each line in `keyframes.txt` corresponds to one keyframe
+- <length (in number of frames)> <light1> <light2> <spotlight> <camera (rotation and position)> <rotation and position(if translatable) for all other nodes>
 
 ## Key bindings
+- `M`: toggle mode (record / play) (default mode: record)
+- `R`: reset view
+- `O`: [in record mode] save keyframe
+
 - `J`, `K` and `L`: toggle light1, light2 and spotlight respectively.
 - `B`: selects Buzz model (selected by default)
 - `H`: selects Hamm model
