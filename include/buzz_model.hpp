@@ -476,8 +476,8 @@ class Buzz {
     // setInitialPose();
   }
 
-  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
-    hip->render(mode, curr_keyframe, curr_frame);
+  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0, int keyframe_gap = 60) {
+    hip->render(mode, curr_keyframe, curr_frame, keyframe_gap);
   }
 
   void setInitialPose() {

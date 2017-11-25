@@ -42,7 +42,7 @@ class HammTorso : public Node {
     local_matrix = scale;
     updateModelMatrix(local_matrix, false);
 
-    glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(450.0f, -210.0f, -100.0f));
+    glm::mat4 translate = glm::translate(glm::mat4(1.f), glm::vec3(750.0f, -210.0f, -1000.0f));
     initial_matrix = translate * glm::scale(glm::mat4(1.0f), 0.7f * glm::vec3(1.0f, 1.0f, 1.0f));
     updateModelMatrix(initial_matrix);
   }
@@ -214,8 +214,8 @@ class Hamm {
     curr_selected_node = 0;
   }
 
-  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0) {
-    torso->render(mode, curr_keyframe, curr_frame);
+  void render(int mode = 0, int curr_keyframe = 0, int curr_frame = 0, int keyframe_gap = 6) {
+    torso->render(mode, curr_keyframe, curr_frame, keyframe_gap);
   }
 
   void rotate(GLuint axis, GLfloat angle) {

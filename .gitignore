@@ -1,2 +1,6 @@
 images/
 build/
+audio/
+old_keyframes/
+*.avi
+*.mp4

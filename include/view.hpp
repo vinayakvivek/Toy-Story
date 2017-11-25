@@ -60,7 +60,10 @@ class View {
   int num_keyframes;
   int curr_keyframe;
   int curr_frame;
+  int total_frame_count;
+  int keyframe_gap;
 
+  std::vector<GLuint> keyframe_length;
   std::vector<glm::vec3> c_rot_keyframes;
   std::vector<glm::vec3> c_pos_keyframes;
   std::vector<glm::vec3> light_keyframes;
